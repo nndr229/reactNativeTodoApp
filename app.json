@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "todo-app",
+    "description": "App to store todo items",
     "slug": "todo-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,13 +14,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.nithin.todo",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

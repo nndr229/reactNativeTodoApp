@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Keyboard,
@@ -12,12 +12,50 @@ import {
   TouchableWithoutFeedbackBase,
   ScrollView,
 } from 'react-native';
-
+// import { useAsyncStorage } from 'use-async-storage';
 // import SyncStorage from 'sync-storage';
+// import { AsyncStorage } from '@react-native-async-storage/async-storage';
 
 export default function App() {
-  const [todos, setTodos] = useState(['Hello']);
   const [todo, setTodo] = useState('');
+  // const [userLevel, setUserLevel] = useAsyncStorage('userLevel', 1);
+
+  // setUserLevel((prevLevel) => {
+  //   return prevLevel + 1;
+  // });
+
+  const [todos, setTodos] = useState([]);
+
+  // function useAsyncStorage(key, initialValue) {
+  //   const [storedValue, setStoredValue] = useState();
+
+  //   async function getStoredItem(key, initialValue) {
+  //     try {
+  //       const item = await AsyncStorage.getItem(key);
+  //       const value = item ? JSON.parse(item) : initialValue;
+  //       setStoredValue(value);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+
+  //   useEffect(() => {
+  //     getStoredItem(key, initialValue);
+  //   }, [key, initialValue]);
+
+  //   const setValue = async (value) => {
+  //     try {
+  //       const valueToStore =
+  //         value instanceof Function ? value(storedValue) : value;
+  //       setStoredValue(valueToStore);
+  //       await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+
+  //   return [storedValue, setValue];
+  // }
 
   const addItem = (newTodo) => {
     if (newTodo.length === 0) {
@@ -28,8 +66,12 @@ export default function App() {
       );
     } else {
       console.log(newTodo);
-      setTodos([newTodo, ...todos]);
+      let newTodos = [newTodo, ...todos];
       setTodo('');
+
+      setTodos(newTodos);
+
+      // setTodos(newTodos);
     }
   };
 
@@ -57,18 +99,24 @@ export default function App() {
           <Button title='Add' onPress={() => addItem(todo)}></Button>
         </View>
         <ScrollView style={styles.scrollView}>
-          {todos.map((todo, idx) => (
-            <View style={styles.todo} key={idx}>
-              <Text style={styles.todoText}>{todo}</Text>
-              <View style={styles.delete}>
-                <Button
-                  color='red'
-                  title='Delete'
-                  onPress={() => deleteTodo(idx)}
-                ></Button>
-              </View>
+          {todos === [] || undefined ? (
+            <View>
+              <Text>Add a todo!</Text>
             </View>
-          ))}
+          ) : (
+            todos.map((todo, idx) => (
+              <View style={styles.todo} key={idx}>
+                <Text style={styles.todoText}>{todo}</Text>
+                <View style={styles.delete}>
+                  <Button
+                    color='red'
+                    title='Delete'
+                    onPress={() => deleteTodo(idx)}
+                  ></Button>
+                </View>
+              </View>
+            ))
+          )}
         </ScrollView>
       </View>
     </TouchableWithoutFeedback>
