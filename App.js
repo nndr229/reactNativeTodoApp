@@ -11,51 +11,33 @@ import {
   Alert,
   TouchableWithoutFeedbackBase,
   ScrollView,
+  AsyncStorage,
 } from 'react-native';
-// import { useAsyncStorage } from 'use-async-storage';
-// import SyncStorage from 'sync-storage';
 // import { AsyncStorage } from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [todo, setTodo] = useState('');
-  // const [userLevel, setUserLevel] = useAsyncStorage('userLevel', 1);
 
-  // setUserLevel((prevLevel) => {
-  //   return prevLevel + 1;
-  // });
+  const [todos, setTodos] = useState(async () => {
+    AsyncStorage.getItem('@MySuperStore:key')
+      .then((value) => {
+        if (value === null) {
+          setTodos([]);
+        } else {
+          setTodos(JSON.parse(value));
+        }
+      })
+      .done();
 
-  const [todos, setTodos] = useState([]);
-
-  // function useAsyncStorage(key, initialValue) {
-  //   const [storedValue, setStoredValue] = useState();
-
-  //   async function getStoredItem(key, initialValue) {
-  //     try {
-  //       const item = await AsyncStorage.getItem(key);
-  //       const value = item ? JSON.parse(item) : initialValue;
-  //       setStoredValue(value);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-
-  //   useEffect(() => {
-  //     getStoredItem(key, initialValue);
-  //   }, [key, initialValue]);
-
-  //   const setValue = async (value) => {
-  //     try {
-  //       const valueToStore =
-  //         value instanceof Function ? value(storedValue) : value;
-  //       setStoredValue(valueToStore);
-  //       await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   return [storedValue, setValue];
-  // }
+    // try {
+    //   const value = await AsyncStorage.getItem('@MySuperStore:key');
+    //   // We have data!!
+    //   return JSON.parse(value)['rootTag'] === '#root' ? [] : JSON.parse(value);
+    // } catch (error) {
+    //   // Error retrieving data
+    //   console.log(error);
+    // }
+  });
 
   const addItem = (newTodo) => {
     if (newTodo.length === 0) {
@@ -65,11 +47,12 @@ export default function App() {
         [{ text: 'Okay', style: 'default' }]
       );
     } else {
-      console.log(newTodo);
+      // console.log(newTodo);
       let newTodos = [newTodo, ...todos];
       setTodo('');
 
-      setTodos(newTodos);
+      console.log(todos);
+      _storeData(newTodos).then(_retrieveData());
 
       // setTodos(newTodos);
     }
@@ -77,6 +60,29 @@ export default function App() {
 
   const deleteTodo = (idx) => {
     setTodos(todos.filter((todo, id) => id !== idx));
+  };
+
+  const _storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('@MySuperStore:key', JSON.stringify(value));
+    } catch (error) {
+      // Error saving data
+      console.log(error);
+    }
+  };
+
+  const _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@MySuperStore:key');
+      if (value !== null) {
+        // We have data!!
+        setTodos(JSON.parse(value));
+        console.log(value);
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error);
+    }
   };
 
   return (
@@ -99,7 +105,7 @@ export default function App() {
           <Button title='Add' onPress={() => addItem(todo)}></Button>
         </View>
         <ScrollView style={styles.scrollView}>
-          {todos === [] || undefined ? (
+          {todos === [] ? (
             <View>
               <Text>Add a todo!</Text>
             </View>
