@@ -38,6 +38,7 @@ export default function App() {
     //   console.log(error);
     // }
   });
+  useEffect(() => {});
 
   const addItem = (newTodo) => {
     if (newTodo.length === 0) {
@@ -52,8 +53,7 @@ export default function App() {
       setTodo('');
 
       console.log(todos);
-      _storeData(newTodos).then(_retrieveData());
-
+      _storeData(newTodos).then(_retrieveData);
       // setTodos(newTodos);
     }
   };
@@ -63,27 +63,44 @@ export default function App() {
   };
 
   const _storeData = async (value) => {
-    try {
-      await AsyncStorage.setItem('@MySuperStore:key', JSON.stringify(value));
-    } catch (error) {
-      // Error saving data
-      console.log(error);
-    }
+    AsyncStorage.setItem('@MySuperStore:key', JSON.stringify(value))
+      .then((value) => {})
+      .done();
+    // try {
+    //   await AsyncStorage.setItem('@MySuperStore:key', JSON.stringify(value));
+    // } catch (error) {
+    //   // Error saving data
+    //   console.log(error);
+    // }
   };
 
   const _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@MySuperStore:key');
-      if (value !== null) {
-        // We have data!!
-        setTodos(JSON.parse(value));
-        console.log(value);
-      }
-    } catch (error) {
-      // Error retrieving data
-      console.log(error);
-    }
+    AsyncStorage.getItem('@MySuperStore:key')
+      .then((value) => {
+        if (value === null) {
+          setTodos(JSON.parse(value));
+        } else {
+          console.log(JSON.parse(value));
+          setTodos([...JSON.parse(value)]);
+        }
+      })
+      .done();
+    // try {
+    //   const value = await AsyncStorage.getItem('@MySuperStore:key');
+    //   if (value !== null) {
+    //     // We have data!!
+    //     setTodos(JSON.parse(value));
+    //     console.log(value);
+    //   }
+    // } catch (error) {
+    //   // Error retrieving data
+    //   console.log(error);
+    // }
   };
+
+  function isPromise(p) {
+    return p && Object.prototype.toString.call(p) === '[object Promise]';
+  }
 
   return (
     <TouchableWithoutFeedback
@@ -105,24 +122,22 @@ export default function App() {
           <Button title='Add' onPress={() => addItem(todo)}></Button>
         </View>
         <ScrollView style={styles.scrollView}>
-          {todos === [] ? (
-            <View>
-              <Text>Add a todo!</Text>
-            </View>
-          ) : (
-            todos.map((todo, idx) => (
-              <View style={styles.todo} key={idx}>
-                <Text style={styles.todoText}>{todo}</Text>
-                <View style={styles.delete}>
-                  <Button
-                    color='red'
-                    title='Delete'
-                    onPress={() => deleteTodo(idx)}
-                  ></Button>
+          {console.log(todos)}
+          {console.log(todos['_U'] === 0)}
+          {todos['_U'] === 0
+            ? null
+            : todos.map((todo, idx) => (
+                <View style={styles.todo} key={idx}>
+                  <Text style={styles.todoText}>{todo}</Text>
+                  <View style={styles.delete}>
+                    <Button
+                      color='red'
+                      title='Delete'
+                      onPress={() => deleteTodo(idx)}
+                    ></Button>
+                  </View>
                 </View>
-              </View>
-            ))
-          )}
+              ))}
         </ScrollView>
       </View>
     </TouchableWithoutFeedback>
